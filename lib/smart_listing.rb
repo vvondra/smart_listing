@@ -74,13 +74,8 @@ module SmartListing
             xval = x
             yval = y
             sort_keys[i][1].split(".").each do |m|
-              if m.is_a?(Array)
-                xval = xval.try(*m)
-                yval = yval.try(*m)
-              else
-                xval = xval.try(m)
-                yval = yval.try(m)
-              end
+              xval = xval.try(*m.split(" "))
+              yval = yval.try(*m.split(" "))
             end
             xval = xval.upcase if xval.is_a?(String)
             yval = yval.upcase if yval.is_a?(String)
