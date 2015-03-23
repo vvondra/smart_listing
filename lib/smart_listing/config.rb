@@ -46,6 +46,8 @@ module SmartListing
           :hidden => "hidden",
           :autoselect => "autoselect",
           :callback => "callback",
+          :pagination_wrapper => "text-center",
+          :pagination_container => "pagination",
           :pagination_per_page => "pagination-per-page text-center",
           :inline_editing => "info",
           :no_records => "no-records",
@@ -80,7 +82,6 @@ module SmartListing
           :inline_edit_backup => "smart-listing-edit-backup",
           :params => "params",
           :observed => "observed",
-          :href => "href",
           :autoshow => "autoshow",
           :popover => "slpopover",
         },
@@ -133,7 +134,7 @@ module SmartListing
         @options[:global_options] ||= {}
         @options[:global_options].merge!(value)
       end
-      !@options[:global_options].try(:empty?) ? DEFAULTS[:global_options] : DEFAULTS[:global_options].deep_merge(@options[:global_options])
+      !@options[:global_options] ? DEFAULTS[:global_options] : DEFAULTS[:global_options].deep_merge(@options[:global_options])
     end
     
     def to_json

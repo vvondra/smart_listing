@@ -1,6 +1,6 @@
 # Useful when SmartListing target url is different than current one
 $.rails.href = (element) ->
-  element.attr("href") || element.data("<%= SmartListing.config.data_attributes(:href) %>")
+  element.attr("href") || element.data("<%= SmartListing.config.data_attributes(:href) %>") || window.location.pathname
 
 class window.SmartListing
   class Config
@@ -33,7 +33,7 @@ class window.SmartListing
     @confirmed = null
     @popovers = {}
 
-    @container.on "ajax:before", (e) =>
+    @container.on "ajax:before", "#{SmartListing.config.class_name("item_actions")}, #{SmartListing.config.class_name("pagination_container")}", (e) =>
       @fadeLoading()
 
     @container.on "ajax:success", (e) =>
@@ -61,8 +61,8 @@ class window.SmartListing
         @cancelEdit(editable)
       else
         # Cancel new record
-        @container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config.class_name("hidden"))
-        @container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config.class_name("hidden"))
+        @container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config.class("hidden"))
+        @container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config.class("hidden"))
 
       @setAutoshow(false)
       false

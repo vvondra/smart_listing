@@ -59,7 +59,7 @@ Next, put following code in controller action you desire:
 @users = smart_listing_create(:users, User.active, partial: "users/listing")
 ```
 
-This will create SmartListing named `:users` consisting of ActiveRecord scope `User.active` elements and rendered by partial `users/listing`. You can also use arrays instead of ActiveRecord collections. Just put @array: true@ option just like for Kaminari.
+This will create SmartListing named `:users` consisting of ActiveRecord scope `User.active` elements and rendered by partial `users/listing`. You can also use arrays instead of ActiveRecord collections. Just put `array: true` option just like for Kaminari.
 
 In the main view (typically something like `index.html.erb` or `index.html.haml`), use this method to render listing:
 
@@ -242,6 +242,31 @@ users_scope = users_scope.like(params[:filter]) if params[:filter]
 ```
 
 Then, JS view is rendered and your SmartListing updated. That's it!
+
+### Simplified views
+
+You don't need to create all the JS views in case you want to simply use one SmartListing per controller. Just use helper methods without their first attribute (name) ie. `smart_listing_create(User.active, partial: "users/listing")`. Then define two helper methods:
+
+ * `smart_listing_resource` returning single object,
+ * `smart_listing_collection` returning collection of objects.
+
+SmartListing default views will user these methods to render your list properly.
+
+### More customization
+
+Apart from standard SmartListing initializer, you can also define custom config profiles. In order to do this, use following syntax:
+
+```ruby
+SmartListing.configure(:awesome_profile) do |config|
+  # put your definitions here
+end
+```
+
+In order to use this profile, create helper method named `smart_listing_config_profile` returning profile name and put into your JS `SmartListing.config.merge()` function call. `merge()` function expects parameter with config attributes hash or reads body data-attribute named `smart-listing-config`. Hash of config attributes can be obtained by using helper method `SmartListing.config(:awesome_profile).to_json`. 
+
+## Not enough?
+
+For more information and some use cases, see the [Showcase](http://showcase.sology.eu/smart_listing)
 
 ## Credits
 
