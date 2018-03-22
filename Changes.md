@@ -1,3 +1,13 @@
+- Rails 5 support and Kaminari update [akostadinov]
+- Better handling of nested controls params
+- Fix controls not fading out list. Related to #51
+- Config now includes element templates
+- Add ability to pass locals to list view [GeorgeDewar]
+
+1.1.2
+-----------
+- Some bugfixing: #20, #46, #58
+
 1.1.0
 -----------
 
