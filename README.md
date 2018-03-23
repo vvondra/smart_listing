@@ -24,6 +24,12 @@ Also, you need to add SmartListing to your asset pipeline:
 //= require smart_listing
 ```
 
+__Rails >= 5.1 users__: Rails 5.1 has dropped jQuery dependency from the default stack in favour of `rails-ujs`. SmartListing still requires jQuery so make sure that you use `jquery_ujs` from `jquery-rails` gem and have following requires in your asset pipeline before `smart_listing`:
+```
+//= require jquery
+//= require jquery_ujs
+```
+
 ### Initializer
 
 Optionally you can also install some configuration initializer:
@@ -73,7 +79,7 @@ smart_listing_render(:users)
 - unless smart_listing.empty?
   %table
     %thead
-      %tr 
+      %tr
         %th User name
         %th Email
     %tbody
@@ -82,7 +88,7 @@ smart_listing_render(:users)
           %td= user.name
           %td= user.email
 
-  = smart_listing.paginate 
+  = smart_listing.paginate
 - else
   %p.warning No records!
 ```
@@ -112,7 +118,7 @@ SmartListing supports two modes of sorting: implicit and explicit. Implicit mode
 - unless smart_listing.empty?
   %table
     %thead
-      %tr 
+      %tr
         %th= smart_listing.sortable "User name", :name
         %th= smart_listing.sortable "Email", :email
     %tbody
@@ -121,12 +127,12 @@ SmartListing supports two modes of sorting: implicit and explicit. Implicit mode
           %td= user.name
           %td= user.email
 
-  = smart_listing.paginate 
+  = smart_listing.paginate
 - else
   %p.warning No records!
 ```
 
-In this case `:name` and `:email` are sorting column names. `Builder#sortable` renders special link containing column name and sort order (either `asc`, `desc`, or empty value). 
+In this case `:name` and `:email` are sorting column names. `Builder#sortable` renders special link containing column name and sort order (either `asc`, `desc`, or empty value).
 
 You can also specify default sort order in the controller:
 
@@ -136,7 +142,7 @@ You can also specify default sort order in the controller:
 
 Implicit mode is convenient with simple data sets. In case you want to sort by joined column names, we advise you to use explicit sorting:
 ```ruby
-@users = smart_listing_create :users, User.active.joins(:stats), partial: "users/listing", 
+@users = smart_listing_create :users, User.active.joins(:stats), partial: "users/listing",
                               sort_attributes: [[:last_signin, "stats.last_signin_at"]],
                               default_sort: {last_signin: "desc"}
 ```
@@ -153,7 +159,7 @@ In order to allow managing and editing list items, we need to reorganize our vie
 - unless smart_listing.empty?
   %table
     %thead
-      %tr 
+      %tr
         %th= smart_listing.sortable "User name", "name"
         %th= smart_listing.sortable "Email", "email"
         %th
@@ -161,9 +167,9 @@ In order to allow managing and editing list items, we need to reorganize our vie
       - smart_listing.collection.each do |user|
         %tr.editable{data: {id: user.id}}
           = smart_listing.render partial: 'users/user', locals: {user: user}
-      = smart_listing.item_new colspan: 3, link: new_user_path 
+      = smart_listing.item_new colspan: 3, link: new_user_path
 
-  = smart_listing.paginate 
+  = smart_listing.paginate
 - else
   %p.warning No records!
 ```
@@ -174,7 +180,7 @@ In order to allow managing and editing list items, we need to reorganize our vie
 <%= smart_listing_item :users, :new, @new_user, "users/form" %>
 ```
 
-Note that `new` action does not need to create SmartListing (via `smart_listing_create`). It just initializes `@new_user` and renders JS view. 
+Note that `new` action does not need to create SmartListing (via `smart_listing_create`). It just initializes `@new_user` and renders JS view.
 
 New partial for user (`users/user`) may look like this:
 ```haml
@@ -204,10 +210,10 @@ Partial name supplied to `smart_listing_item` (`users/form`) references `@user` 
 
   = form_for object, url: object.new_record? ? users_path : user_path(object), remote: true do |f|
     %p
-      Name: 
+      Name:
       = f.text_field :name
     %p
-      Email: 
+      Email:
       = f.text_field :email
     %p= f.submit "Save"
 ```
@@ -228,7 +234,7 @@ SmartListing controls allow you to change somehow presented data. This is typica
   .filter.input-append
     = text_field_tag :filter, '', class: "search", placeholder: "Type name here", autocomplete: "off"
     %button.btn.disabled{type: "submit"}
-      %i.icon.icon-search
+      %span.glyphicon.glyphicon-search
 ```
 
 This gives you nice Bootstrap-enabled filter field with keychange handler. Of course you can use any other form fields in controls too.
@@ -262,7 +268,7 @@ SmartListing.configure(:awesome_profile) do |config|
 end
 ```
 
-In order to use this profile, create helper method named `smart_listing_config_profile` returning profile name and put into your JS `SmartListing.config.merge()` function call. `merge()` function expects parameter with config attributes hash or reads body data-attribute named `smart-listing-config`. Hash of config attributes can be obtained by using helper method `SmartListing.config(:awesome_profile).to_json`. 
+In order to use this profile, create helper method named `smart_listing_config_profile` returning profile name and put into your JS `SmartListing.config.merge()` function call. `merge()` function expects parameter with config attributes hash or reads body data-attribute named `smart-listing-config`. Hash of config attributes can be obtained by using helper method `SmartListing.config(:awesome_profile).to_json`.
 
 ## Not enough?
 

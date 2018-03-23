@@ -65,7 +65,6 @@ SmartListing.configure do |config|
     #:inline_edit_backup    => "smart-listing-edit-backup",
     #:params                => "params",
     #:observed              => "observed",
-    #:href                  => "href",
     #:autoshow              => "autoshow",
     #:popover               => "slpopover",
   }
@@ -84,5 +83,9 @@ SmartListing.configure do |config|
 
   config.constants :element_templates, {
     #:row => "<tr />",
+  }
+
+  config.constants :bootstrap_commands, {
+    #:popover_destroy       => "destroy", # Bootstrap 4 requries dipsose instead of destroy
   }
 end

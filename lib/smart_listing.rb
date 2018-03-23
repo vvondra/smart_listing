@@ -21,7 +21,9 @@ end
 
 module SmartListing
   class Base
-    attr_reader :name, :collection, :options, :per_page, :sort, :page, :partial, :count
+    attr_reader :name, :collection, :options, :per_page, :sort, :page, :partial, :count, :params
+    # Params that should not be visible in pagination links (pages, per-page, sorting, etc.)
+    UNSAFE_PARAMS = [:authenticity_token, :commit, :utf8, :_method, :script_name].freeze
 
     def initialize name, collection, options = {}
       @name = name
@@ -46,6 +48,9 @@ module SmartListing
 
     def setup params, cookies
       @params = params
+      @params = @params.to_unsafe_h if @params.respond_to?(:to_unsafe_h)
+      @params = @params.with_indifferent_access
+      @params.except!(*UNSAFE_PARAMS)
 
       @page = get_param :page
       @per_page = !get_param(:per_page) || get_param(:per_page).empty? ? (@options[:memorize_per_page] && get_param(:per_page, cookies).to_i > 0 ? get_param(:per_page, cookies).to_i : page_sizes.first) : get_param(:per_page).to_i
@@ -68,8 +73,8 @@ module SmartListing
       end
 
       if @options[:array]
-        if @sort && @sort.any? # when array we sort only by first attribute
-          i = sort_keys.index{|x| x[0] == @sort.first[0]}
+        if @sort && !@sort.empty? # when array we sort only by first attribute
+          i = sort_keys.index{|x| x[0] == @sort.to_h.first[0]}
           @collection = @collection.sort do |x, y|
             xval = x
             yval = y
@@ -83,7 +88,7 @@ module SmartListing
             if xval.nil? || yval.nil?
               xval.nil? ? 1 : -1
             else
-              if @sort.first[1] == "asc"
+              if @sort.to_h.first[1] == "asc"
                 (xval <=> yval) || (xval && !yval ? 1 : -1)
               else
                 (yval <=> xval) || (yval && !xval ? 1 : -1)
@@ -94,13 +99,13 @@ module SmartListing
         if @options[:paginate] && @per_page > 0
           @collection = ::Kaminari.paginate_array(@collection).page(@page).per(@per_page)
           if @collection.length == 0
-            @collection = @collection.page(@collection.num_pages)
+            @collection = @collection.page(@collection.total_pages)
           end
         end
       else
         # let's sort by all attributes
         #
-        @collection = @collection.order(sort_keys.collect{|s| "#{s[1]} #{@sort[s[0]]}" if @sort[s[0]]}.compact) if @sort && @sort.any?
+        @collection = @collection.order(sort_keys.collect{|s| "#{s[1]} #{@sort[s[0]]}" if @sort[s[0]]}.compact) if @sort && !@sort.empty?
 
         if @options[:paginate] && @per_page > 0
           @collection = @collection.page(@page).per(@per_page)

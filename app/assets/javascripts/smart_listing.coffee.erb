@@ -1,3 +1,10 @@
+# endsWith polyfill
+if !String::endsWith
+  String::endsWith = (search, this_len) ->
+    if this_len == undefined or this_len > @length
+      this_len = @length
+    @substring(this_len - (search.length), this_len) == search
+
 # Useful when SmartListing target url is different than current one
 $.rails.href = (element) ->
   element.attr("href") || element.data("<%= SmartListing.config.data_attributes(:href) %>") || window.location.pathname
@@ -23,6 +30,9 @@ class window.SmartListing
 
     @element_template: (name)->
       @options["constants"]["element_templates"][name]
+
+    @bootstrap_commands: (name)->
+      @options["constants"]["bootstrap_commands"][name]
 
   @config: Config
 
@@ -319,8 +329,8 @@ $.fn.smart_listing.observeField = (field, opts = {}) ->
      , 400)
 
 $.fn.smart_listing.showPopover = (elem, body) ->
-  elem.popover("destroy")
-  elem.popover(content: body, html: true, trigger: "manual", title: null)
+  elem.popover(SmartListing.config.bootstrap_commands("popover_destroy"))
+  elem.popover(content: body, html: true, trigger: "manual")
   elem.popover("show")
 
 $.fn.smart_listing.showConfirmation = (confirmation_elem, msg, confirm_callback) ->
@@ -333,12 +343,12 @@ $.fn.smart_listing.showConfirmation = (confirmation_elem, msg, confirm_callback)
         editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"))
         confirm_callback(confirmation_elem)
         $(confirmation_elem).click()
-        $(confirmation_elem).popover("destroy")
+        $(confirmation_elem).popover(SmartListing.config.bootstrap_commands("popover_destroy"))
       )
       .append(" ")
       .append($("<button/>").html("No").addClass("btn btn-small").click (event) =>
         editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"))
-        $(confirmation_elem).popover("destroy")
+        $(confirmation_elem).popover(SmartListing.config.bootstrap_commands("popover_destroy"))
       )
     )
 
@@ -438,4 +448,4 @@ ready = ->
   $(SmartListing.config.class_name("controls")).smart_listing_controls()
 
 $(document).ready ready
-$(document).on "page:load", ready
+$(document).on "page:load turbolinks:load", ready

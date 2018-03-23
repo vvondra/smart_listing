@@ -1,3 +1,29 @@
+1.2.2
+-----------
+
+- Remove duplicated href key from config template #146 [nfilzi]
+- Replace deprecated .any? with .present? #143 [AakLak]
+- Development environment update #140 [mizinsky]
+- Fix sanitize_params method #137 [mizinsky]
+- Enable to configure global remote option and it to affects sortable helper #131 [kitabatake]
+- Kaminari update [mizinsky]
+- Update Readme for Rails >= 5.1 Users [mizinsky]
+
+1.2.1
+-----------
+
+- Allow to render outside of controllers [bval]
+- Documentation fixes [blackcofla]
+- Use id.to_json so integers and uuids will both work [sevgibson]
+- Fix popover in bootstrap 4 [sevgibson]
+- Fix Kaminari #num_pages deprecation warning [tylerhunt]
+- Add support for Turbolinks 5 [wynksaiddestroy]
+- Use #empty? for AC::Params [phoffer]
+- Fix indentation in some files [boy-papan]
+
+1.2.0
+-----------
+
 - Rails 5 support and Kaminari update [akostadinov]
 - Better handling of nested controls params
 - Fix controls not fading out list. Related to #51
@@ -6,6 +32,7 @@
 
 1.1.2
 -----------
+
 - Some bugfixing: #20, #46, #58
 
 1.1.0

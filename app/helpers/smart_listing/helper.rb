@@ -11,6 +11,7 @@ module SmartListing
         name = (args[0] || options[:name] || controller_name).to_sym
         collection = args[1] || options[:collection] || smart_listing_collection
 
+        view_context = self.respond_to?(:controller) ? controller.view_context : self.view_context
         options = {:config_profile => view_context.smart_listing_config_profile}.merge(options)
 
         list = SmartListing::Base.new(name, collection, options)
@@ -32,8 +33,6 @@ module SmartListing
     end
 
     class Builder
-      # Params that should not be visible in pagination links (pages, per-page, sorting, etc.)
-      UNSAFE_PARAMS = {:authenticity_token => nil, :utf8 => nil}
 
       class_attribute :smart_listing_helpers
 
@@ -47,7 +46,7 @@ module SmartListing
 
       def paginate options = {}
         if @smart_listing.collection.respond_to? :current_page
-          @template.paginate @smart_listing.collection, {:remote => @smart_listing.remote?, :param_name => @smart_listing.param_name(:page), :params => UNSAFE_PARAMS}.merge(@smart_listing.kaminari_options)
+          @template.paginate @smart_listing.collection, {:remote => @smart_listing.remote?, :param_name => @smart_listing.param_name(:page)}.merge(@smart_listing.kaminari_options)
         end
       end
 
@@ -77,7 +76,7 @@ module SmartListing
 
       def pagination_per_page_link page
         if @smart_listing.per_page.to_i != page
-          url = @template.url_for(sanitize_params(@template.params.merge(@smart_listing.all_params(:per_page => page, :page => 1))))
+          url = @template.url_for(@smart_listing.params.merge(@smart_listing.all_params(:per_page => page, :page => 1)))
         end
 
         locals = {
@@ -99,10 +98,11 @@ module SmartListing
 
         locals = {
           :order => @smart_listing.sort_order(attribute),
-          :url => @template.url_for(sanitize_params(@template.params.merge(@smart_listing.all_params(:sort => sort_params)))),
+          :url => @template.url_for(@smart_listing.params.merge(@smart_listing.all_params(:sort => sort_params))),
           :container_classes => [@template.smart_listing_config.classes(:sortable)],
           :attribute => attribute,
-          :title => title
+          :title => title,
+          :remote => @smart_listing.remote?
         }
 
         @template.render(:partial => 'smart_listing/sortable', :locals => default_locals.merge(locals))
@@ -179,11 +179,6 @@ module SmartListing
 
       private
 
-      def sanitize_params params
-        params = params.permit! if params.respond_to?(:permit!)
-        params.merge(UNSAFE_PARAMS)
-      end
-
       def default_locals
         {:smart_listing => @smart_listing, :builder => self}
       end
@@ -230,7 +225,7 @@ module SmartListing
     end
 
     def smart_listing_render name = controller_name, *args
-      options = args.extract_options!
+      options = args.dup.extract_options!
       smart_listing_for(name, *args) do |smart_listing|
         concat(smart_listing.render_list(options[:locals]))
       end
@@ -317,7 +312,7 @@ module SmartListing
       smart_listing = @smart_listings[name]
 
       # don't update list if params are missing (prevents interfering with other lists)
-      if params.keys.select{|k| k.include?("smart_listing")}.any? && !params[smart_listing.base_param]
+      if params.keys.select{|k| k.include?("smart_listing")}.present? && !params[smart_listing.base_param]
         return unless options[:force]
       end
 
